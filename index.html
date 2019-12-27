@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title></title>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" href="">
+
+<script src="js/showdown.js"></script>
+<script>
+window.addEventListener( 'load', function() {
+  convert.addEventListener( 'click', convertHtml)
+
+}, false )
+
+function convertHtml() {
+
+  // 変換元のmarkdown取得
+  let text = document.getElementById("markdown-mk").value
+  // 変換処理
+  let converter = new showdown.Converter();
+  converter.setOption("omitExtraWLInCodeBlocks", true)
+  converter.setOption("tables", true)
+  let html = converter.makeHtml(text)
+
+  // 変換後のHTMLをテキストエリアに設定
+  document.getElementById("markdown-html").value = html
+}
+
+</script>
+</head>
+<body>
+<div>
+  <header>
+    <h1>Markdown to HTML</h1>
+  </header>
+  <main>
+    <div>
+        <textarea id="markdown-mk" class="uk-textarea" cols="150" rows="15"></textarea>
+    </div>
+    <div style="margin: 10px 0;">
+      <button id="convert">Convert</button>
+    </div>
+    <div>
+        <textarea id="markdown-html" cols="150" rows="15"></textarea>
+    </div>
+  </main>
+  <footer>
+  </footer>
+</div>
+</body>
+</html>
