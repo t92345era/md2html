@@ -4198,16 +4198,28 @@ showdown.subParser('makehtml.tables', function (text, options, globals) {
     }
     header = showdown.subParser('makehtml.spanGamut')(header, options, globals);
 
-    return '<th' + id + style + '>' + header + '</th>\n';
+    let s = style;
+    if (s) {
+      s += 'background:#ddd;padding:3px';
+    } else {
+      s = ' style="background:#ddd;padding:3px"';
+    }
+    return '<th' + id + s + '>' + header + '</th>\n';
   }
 
   function parseCells (cell, style) {
     var subText = showdown.subParser('makehtml.spanGamut')(cell, options, globals);
-    return '<td' + style + '>' + subText + '</td>\n';
+    let s = style;
+    if (s) {
+      s += 'padding:3px';
+    } else {
+      s = ' style="padding:3px"';
+    }
+    return '<td' + s + '>' + subText + '</td>\n';
   }
 
   function buildTable (headers, cells) {
-    var tb = '<table>\n<thead>\n<tr>\n',
+    var tb = '<table border="1">\n<thead>\n<tr>\n',
         tblLgn = headers.length;
 
     for (var i = 0; i < tblLgn; ++i) {
