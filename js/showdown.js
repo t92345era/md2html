@@ -1,4 +1,7 @@
 ;/*! showdown v 2.0.0-alpha1 - 24-10-2018 */
+
+var mdmode = "p";  // p:ぽてぱん、r:ライト
+
 (function(){
 /**
  * Created by Tivie on 13-07-2015.
@@ -2410,7 +2413,12 @@ showdown.subParser('makehtml.codeSpans', function (text, options, globals) {
       c = c.replace(/^([ \t]*)/g, '');	// leading whitespace
       c = c.replace(/[ \t]*$/g, '');	// trailing whitespace
       c = showdown.subParser('makehtml.encodeCode')(c, options, globals);
-      c = m1 + '<code>' + c + '</code>';
+      if (mdmode == "r") {
+        c = m1 + '<span class="theme:classic highlight:0 lang:default decode:true crayon-inline">' + c + '</span>';
+      } else {
+        c = m1 + '<code>' + c + '</code>';        
+      }
+      
       c = showdown.subParser('makehtml.hashHTMLSpans')(c, options, globals);
       return c;
     }
@@ -2687,13 +2695,21 @@ showdown.subParser('makehtml.githubCodeBlocks', function (text, options, globals
     //カスタマイズ部分
     if (language) {
       //言語指定あり
-      codeblock = '<pre class="theme:eclipse lang:' + language + ' decode:true"><code>' + codeblock + end + '</code></pre>';
+      if (mdmode == "r") {
+        codeblock = '<pre class="theme:classic lang:' + language + ' decode:true">' + codeblock + end + '</pre>';
+      } else {
+        codeblock = '<pre class="theme:eclipse lang:' + language + ' decode:true"><code>' + codeblock + end + '</code></pre>';
+      }      
     } else {
       //言語指定なし
-      codeblock = '<pre class="nums:false lang:default decode:true"><code>' + codeblock + end + '</code></pre>';
+      if (mdmode == "r") {
+        codeblock = '<pre class="nums:false lang:default decode:true">' + codeblock + end + '</pre>';
+      } else {
+        codeblock = '<pre class="nums:false lang:default decode:true"><code>' + codeblock + end + '</code></pre>';
+      }
     }
     
-    console.log(codeblock)
+    //console.log(codeblock)
     codeblock = showdown.subParser('makehtml.hashBlock')(codeblock, options, globals);
     
     // Since GHCodeblocks can be false positives, we need to
@@ -2955,16 +2971,30 @@ showdown.subParser('makehtml.headers', function (text, options, globals) {
 
     var spanGamut = showdown.subParser('makehtml.spanGamut')(m1, options, globals),
         hID = (options.noHeaderId) ? '' : ' id="' + headerId(m1) + '"',
-        hLevel = headerLevelStart,
-        hashBlock = '<h' + hLevel + hID + '>' + spanGamut + '</h' + hLevel + '>';
+        hLevel = headerLevelStart, hashBlock = "";
+        if (mdmode == "r") {
+          let hcls = "";
+          if (hLevel == 2) hcls = ' class="style3a"';
+          if (hLevel == 3) hcls = ' class="style4a"';
+          hashBlock = '<h' + hLevel + hcls + '>' + spanGamut + '</h' + hLevel + '>';
+        } else {
+          hashBlock = '<h' + hLevel + hID + '>' + spanGamut + '</h' + hLevel + '>';
+        }
     return showdown.subParser('makehtml.hashBlock')(hashBlock, options, globals);
   });
 
   text = text.replace(setextRegexH2, function (matchFound, m1) {
     var spanGamut = showdown.subParser('makehtml.spanGamut')(m1, options, globals),
         hID = (options.noHeaderId) ? '' : ' id="' + headerId(m1) + '"',
-        hLevel = headerLevelStart + 1,
-        hashBlock = '<h' + hLevel + hID + '>' + spanGamut + '</h' + hLevel + '>';
+        hLevel = headerLevelStart + 1, hashBlock = "";
+        if (mdmode == "r") {
+          let hcls = "";
+          if (hLevel == 2) hcls = ' class="style3a"';
+          if (hLevel == 3) hcls = ' class="style4a"';
+          hashBlock = '<h' + hLevel + hcls + '>' + spanGamut + '</h' + hLevel + '>';
+        } else {
+          hashBlock = '<h' + hLevel + hID + '>' + spanGamut + '</h' + hLevel + '>';
+        }
     return showdown.subParser('makehtml.hashBlock')(hashBlock, options, globals);
   });
 
@@ -2985,9 +3015,16 @@ showdown.subParser('makehtml.headers', function (text, options, globals) {
 
     var span = showdown.subParser('makehtml.spanGamut')(hText, options, globals),
         hID = (options.noHeaderId) ? '' : ' id="' + headerId(m2) + '"',
-        hLevel = headerLevelStart - 1 + m1.length,
-        header = '<h' + hLevel + hID + '>' + span + '</h' + hLevel + '>';
-
+        hLevel = headerLevelStart - 1 + m1.length, header = "";
+        if (mdmode == "r") {
+          let hcls = "";
+          if (hLevel == 2) hcls = ' class="style3a"';
+          if (hLevel == 3) hcls = ' class="style4a"';
+          header = '<h' + hLevel + hcls + '>' + span + '</h' + hLevel + '>';
+        } else {
+          header = '<h' + hLevel + hID + '>' + span + '</h' + hLevel + '>';
+        }
+        
     return showdown.subParser('makehtml.hashBlock')(header, options, globals);
   });
 
@@ -3211,14 +3248,24 @@ showdown.subParser('makehtml.italicsAndBold', function (text, options, globals) 
     });
   } else {
     text = text.replace(/___(\S[\s\S]*?)___/g, function (wm, m) {
-      return (/\S$/.test(m)) ? parseInside (m, '<strong><em>', '</em></strong>') : wm;
+      if (mdmode == "r") {
+        return (/\S$/.test(m)) ? parseInside (m, '<strong><span style="background-color: #ffff99;">', '</span></strong>') : wm;
+      } else {
+        return (/\S$/.test(m)) ? parseInside (m, '<strong><em>', '</em></strong>') : wm;
+      }
+      
     });
     text = text.replace(/__(\S[\s\S]*?)__/g, function (wm, m) {
       return (/\S$/.test(m)) ? parseInside (m, '<strong>', '</strong>') : wm;
     });
     text = text.replace(/_([^\s_][\s\S]*?)_/g, function (wm, m) {
       // !/^_[^_]/.test(m) - test if it doesn't start with __ (since it seems redundant, we removed it)
-      return (/\S$/.test(m)) ? parseInside (m, '<em>', '</em>') : wm;
+      if (mdmode == "r") {
+        return (/\S$/.test(m)) ? parseInside (m, '<span style="background-color: #ffff99;">', '</span>') : wm;
+      } else {
+        return (/\S$/.test(m)) ? parseInside (m, '<em>', '</em>') : wm;
+      }
+      
     });
   }
 

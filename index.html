@@ -18,6 +18,17 @@ window.addEventListener( 'load', function() {
 
 function convertHtml() {
 
+  var elements = document.getElementsByName( "mode" ) ;
+
+  // 選択状態の値を取得
+  for ( var a="", i=elements.length; i--; ) {
+    if ( elements[i].checked ) {
+      mdmode = elements[i].value ;
+      break;
+    }
+  }
+
+
   // 変換元のmarkdown取得
   let text = document.getElementById("markdown-mk").value
   // 変換処理
@@ -43,6 +54,8 @@ function convertHtml() {
     </div>
     <div style="margin: 10px 0;">
       <button id="convert">Convert</button>
+      <input type="radio" name="mode" value="r"/> R
+      <input type="radio" name="mode" value="p" checked/> P
     </div>
     <div>
         <textarea id="markdown-html" cols="150" rows="15"></textarea>
