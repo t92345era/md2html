@@ -2416,7 +2416,7 @@ showdown.subParser('makehtml.codeSpans', function (text, options, globals) {
       if (mdmode == "r") {
         c = m1 + '<span class="theme:classic highlight:0 lang:default decode:true crayon-inline">' + c + '</span>';
       } else {
-        c = m1 + '<code>' + c + '</code>';        
+        c = m1 + '<span class="theme:eclipse lang:default decode:true crayon-inline">' + c + '</span>';
       }
       
       c = showdown.subParser('makehtml.hashHTMLSpans')(c, options, globals);
