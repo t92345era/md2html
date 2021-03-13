@@ -1,68 +1,102 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>Simple Markdown to HTML Converter</title>
-<meta charset="utf-8">
-<meta name="description" content="">
-<meta name="author" content="">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="shortcut icon" href="">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Simple Markdown to HTML Converter</title>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="">
 
-<script src="js/showdown.js"></script>
-<script>
-window.addEventListener( 'load', function() {
-  convert.addEventListener( 'click', convertHtml)
+  <script src="js/showdown.js"></script>
+  <script>
+    window.addEventListener('load', function () {
+      convert.addEventListener('click', convertHtml)
+      convert_kanren.addEventListener('click', convertKanren)
+    }, false)
 
-}, false )
+    function convertHtml() {
 
-function convertHtml() {
+      var elements = document.getElementsByName("mode");
 
-  var elements = document.getElementsByName( "mode" ) ;
+      // 選択状態の値を取得
+      for (var a = "", i = elements.length; i--;) {
+        if (elements[i].checked) {
+          mdmode = elements[i].value;
+          break;
+        }
+      }
 
-  // 選択状態の値を取得
-  for ( var a="", i=elements.length; i--; ) {
-    if ( elements[i].checked ) {
-      mdmode = elements[i].value ;
-      break;
+
+      // 変換元のmarkdown取得
+      let text = document.getElementById("markdown-mk").value
+      // 変換処理
+      let converter = new showdown.Converter();
+      converter.setOption("omitExtraWLInCodeBlocks", true)
+      converter.setOption("tables", true)
+      let html = converter.makeHtml(text)
+
+      // 変換後のHTMLをテキストエリアに設定
+      document.getElementById("markdown-html").value = html
     }
-  }
 
+    function convertKanren() {
+      let url = document.getElementById("kanren-url").value
+      let title = document.getElementById("kanren-title").value
+      
+      let html = "【関連記事】\n"
+      html += `▶<a href='${url}'>${title}</a>`
+      document.getElementById("kanren-html").value = html
 
-  // 変換元のmarkdown取得
-  let text = document.getElementById("markdown-mk").value
-  // 変換処理
-  let converter = new showdown.Converter();
-  converter.setOption("omitExtraWLInCodeBlocks", true)
-  converter.setOption("tables", true)
-  let html = converter.makeHtml(text)
+    }
 
-  // 変換後のHTMLをテキストエリアに設定
-  document.getElementById("markdown-html").value = html
-}
-
-</script>
+  </script>
 </head>
+
 <body>
 <div>
   <header>
     <h1>Markdown to HTML</h1>
   </header>
   <main>
-    <div>
-        <textarea id="markdown-mk" class="uk-textarea" cols="150" rows="15"></textarea>
-    </div>
-    <div style="margin: 10px 0;">
-      <button id="convert">Convert</button>
-      <input type="radio" name="mode" value="r"/> R
-      <input type="radio" name="mode" value="p" checked/> P
-    </div>
-    <div>
-        <textarea id="markdown-html" cols="150" rows="15"></textarea>
+    <div class="tab-control">
+      <a class="tab" href="#">MDToHTML</a>
+      <a class="tab" href="#">関連記事</a>
+      <div class="tab-page" data-tab-name="markdown">
+        <div>
+          <textarea id="markdown-mk" class="uk-textarea" cols="150" rows="15"></textarea>
+        </div>
+        <div style="margin: 10px 0;">
+          <button id="convert">Convert</button>
+          <input type="radio" name="mode" value="r" /> R
+          <input type="radio" name="mode" value="p" checked /> P
+        </div>
+        <div>
+          <textarea id="markdown-html" cols="150" rows="15"></textarea>
+        </div>
+      </div>
+      <h3>関連記事</h3>
+      <div class="tab-page" data-tab-name="kanren">
+        <p>
+          <label>URL</label>
+          <input id="kanren-url" type="text" style="width: 700px;"/>
+        </p>
+        <p>
+          <label>TITLE</label>
+          <input id="kanren-title" type="text" style="width: 700px;"/>
+        </p>
+        <button id="convert_kanren">Convert</button>
+        <div style="margin: 10px 0;">
+          <textarea id="kanren-html" class="uk-textarea" cols="150" rows="3"></textarea>
+        </div>
+      </div>
     </div>
   </main>
   <footer>
   </footer>
 </div>
 </body>
+
 </html>
