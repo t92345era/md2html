@@ -2703,9 +2703,9 @@ showdown.subParser('makehtml.githubCodeBlocks', function (text, options, globals
     } else {
       //言語指定なし
       if (mdmode == "r") {
-        codeblock = '<pre class="nums:false lang:default decode:true">' + codeblock + end + '</pre>';
+        codeblock = '<pre class="nums:false lang:default highlight:0 decode:true">' + codeblock + end + '</pre>';
       } else {
-        codeblock = '<pre class="nums:false lang:default decode:true"><code>' + codeblock + end + '</code></pre>';
+        codeblock = '<pre class="nums:false lang:default highlight:0 decode:true"><code>' + codeblock + end + '</code></pre>';
       }
     }
     
