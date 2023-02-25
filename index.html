@@ -38,6 +38,11 @@
       converter.setOption("tables", true)
       let html = converter.makeHtml(text)
 
+      if (mdmode == "e") {
+        html = html.replace('<p>参考：<a', '<p class="fs-14">参考：<a')
+        //<p>参考：<a 
+      }
+
       // 変換後のHTMLをテキストエリアに設定
       document.getElementById("markdown-html").value = html
     }
@@ -71,7 +76,8 @@
         <div style="margin: 10px 0;">
           <button id="convert">Convert</button>
           <input type="radio" name="mode" value="r" /> R
-          <input type="radio" name="mode" value="p" checked /> P
+          <input type="radio" name="mode" value="p" /> P
+          <input type="radio" name="mode" value="e" checked /> EIZI
         </div>
         <div>
           <textarea id="markdown-html" cols="150" rows="15"></textarea>

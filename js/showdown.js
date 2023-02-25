@@ -2977,6 +2977,12 @@ showdown.subParser('makehtml.headers', function (text, options, globals) {
           if (hLevel == 2) hcls = ' class="style3a"';
           if (hLevel == 3) hcls = ' class="style4a"';
           hashBlock = '<h' + hLevel + hcls + '>' + spanGamut + '</h' + hLevel + '>';
+        } else if (mdmode == "e") {
+          if (hLevel == 2) {
+            hashBlock = `<h2 class="article-h2"><span class="article-h2-inner">${spanGamut}</span></h2>`
+          } else {
+            hashBlock = `<h${hLevel} class="article-h${hLevel}">${spanGamut}</h3>`
+          }
         } else {
           hashBlock = '<h' + hLevel + hID + '>' + spanGamut + '</h' + hLevel + '>';
         }
@@ -2992,6 +2998,12 @@ showdown.subParser('makehtml.headers', function (text, options, globals) {
           if (hLevel == 2) hcls = ' class="style3a"';
           if (hLevel == 3) hcls = ' class="style4a"';
           hashBlock = '<h' + hLevel + hcls + '>' + spanGamut + '</h' + hLevel + '>';
+        } else if (mdmode == "e") {
+          if (hLevel == 2) {
+            hashBlock = `<h2 class="article-h2"><span class="article-h2-inner">${spanGamut}</span></h2>`
+          } else {
+            hashBlock = `<h${hLevel} class="article-h${hLevel}">${spanGamut}</h3>`
+          }
         } else {
           hashBlock = '<h' + hLevel + hID + '>' + spanGamut + '</h' + hLevel + '>';
         }
@@ -3021,6 +3033,12 @@ showdown.subParser('makehtml.headers', function (text, options, globals) {
           if (hLevel == 2) hcls = ' class="style3a"';
           if (hLevel == 3) hcls = ' class="style4a"';
           header = '<h' + hLevel + hcls + '>' + span + '</h' + hLevel + '>';
+        } else if (mdmode == "e") {
+          if (hLevel == 2) {
+            header = `<h2 class="article-h2"><span class="article-h2-inner">${span}</span></h2>`
+          } else {
+            header = `<h${hLevel} class="article-h${hLevel}">${span}</h3>`
+          }
         } else {
           header = '<h' + hLevel + hID + '>' + span + '</h' + hLevel + '>';
         }
@@ -3333,6 +3351,7 @@ showdown.subParser('makehtml.italicsAndBold', function (text, options, globals) 
       }
 
       var evt = createEvent(rgx, evtRootName + '.captureStart', wholeMatch, text, id, url, title, options, globals);
+      console.log(evt)
       return writeAnchorTag(evt, options, globals, emptyCase);
     };
   }
@@ -3421,6 +3440,8 @@ showdown.subParser('makehtml.italicsAndBold', function (text, options, globals) 
       target = ' target="¨E95Eblank"';
     }
 
+    
+
     // Text can be a markdown element, so we run through the appropriate parsers
     text = showdown.subParser('makehtml.codeSpans')(text, options, globals);
     text = showdown.subParser('makehtml.emoji')(text, options, globals);
@@ -3432,7 +3453,13 @@ showdown.subParser('makehtml.italicsAndBold', function (text, options, globals) 
 
     //evt = createEvent(rgx, evtRootName + '.captureEnd', wholeMatch, text, id, url, title, options, globals);
 
-    var result = '<a href="' + url + '"' + title + target + '>' + text + '</a>';
+    var result = ""
+    if (mdmode == "e") {
+      target = 'target="_blank"';
+      result = '<a class="article-link" href="' + url + '"' + title + target + '>' + text + ' <i class="fa-solid fa-arrow-up-right-from-square"></i></a>';  
+    } else {
+      result = '<a class="article-link" href="' + url + '"' + title + target + '>' + text + '</a>';  
+    }
 
     //evt = createEvent(rgx, evtRootName + '.beforeHash', wholeMatch, text, id, url, title, options, globals);
 
@@ -3574,6 +3601,8 @@ showdown.subParser('makehtml.italicsAndBold', function (text, options, globals) 
       var url = options.ghMentionsLink.replace(/{u}/g, username);
       var evt = createEvent(rgx, evtRootName + '.captureStart', wholeMatch, mentions, null, url, null, options, globals);
       // captureEnd Event is triggered inside writeAnchorTag function
+
+      console.log("st=", st)
       return st + writeAnchorTag(evt, options, globals);
     });
 
@@ -3883,13 +3912,19 @@ showdown.subParser('makehtml.lists', function (text, options, globals) {
         counterRxg = (listType === 'ul') ? olRgx : ulRgx,
         result = '';
 
+    var className = ""
+
+    if (mdmode == "e" && listType === 'ul') {
+      className = ' class="article-ul"'
+    }
+
     if (list.search(counterRxg) !== -1) {
       (function parseCL (txt) {
         var pos = txt.search(counterRxg),
             style = styleStartNumber(list, listType);
         if (pos !== -1) {
           // slice
-          result += '\n\n<' + listType + style + '>\n' + processListItems(txt.slice(0, pos), !!trimTrailing) + '</' + listType + '>\n';
+          result += '\n\n<' + listType + style + className + '>\n' + processListItems(txt.slice(0, pos), !!trimTrailing) + '</' + listType + '>\n';
 
           // invert counterType and listType
           listType = (listType === 'ul') ? 'ol' : 'ul';
@@ -3898,12 +3933,12 @@ showdown.subParser('makehtml.lists', function (text, options, globals) {
           //recurse
           parseCL(txt.slice(pos));
         } else {
-          result += '\n\n<' + listType + style + '>\n' + processListItems(txt, !!trimTrailing) + '</' + listType + '>\n';
+          result += '\n\n<' + listType + style + className + '>\n' + processListItems(txt, !!trimTrailing) + '</' + listType + '>\n';
         }
       })(list);
     } else {
       var style = styleStartNumber(list, listType);
-      result = '\n\n<' + listType + style + '>\n' + processListItems(list, !!trimTrailing) + '</' + listType + '>\n';
+      result = '\n\n<' + listType + style + className + '>\n' + processListItems(list, !!trimTrailing) + '</' + listType + '>\n';
     }
 
     return result;
